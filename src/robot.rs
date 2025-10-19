@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use robot_behavior::{
-    ArmBehavior, ArmDOF, ArmParam, ArmState, Coord, LoadState, OverrideOnce, RobotResult,
+    Arm, ArmDOF, ArmParam, ArmState, Coord, LoadState, OverrideOnce, RobotResult,
 };
 
 pub trait AuboType {
@@ -41,7 +41,7 @@ where
     }
 }
 
-impl<T: AuboType, const N: usize> ArmBehavior<N> for AuboRobot<T, N>
+impl<T: AuboType, const N: usize> Arm<N> for AuboRobot<T, N>
 where
     AuboRobot<T, N>: ArmParam<N>,
 {
