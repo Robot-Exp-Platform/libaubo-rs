@@ -117,7 +117,6 @@ impl<T: AuboType, const N: usize> ArmParam<N> for AuboRobot<T, N>
 where
     T: ArmParam<N>,
 {
-    const DH: [[f64; 4]; N] = T::DH;
     const JOINT_DEFAULT: [f64; N] = T::JOINT_DEFAULT;
     const JOINT_MIN: [f64; N] = T::JOINT_MIN;
     const JOINT_MAX: [f64; N] = T::JOINT_MAX;
