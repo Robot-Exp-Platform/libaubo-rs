@@ -1,5 +1,5 @@
 [package]
-name = "libaub"
+name = "libaubo"
 version = "0.1.1"
 edition = "2024"
 authors = ["Yixing <yanjizhou312@163.com>"]
