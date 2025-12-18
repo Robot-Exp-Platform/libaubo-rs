@@ -55,13 +55,13 @@ where
         self.coord.set(coord);
         Ok(())
     }
-    fn set_speed(&mut self, speed: f64) -> RobotResult<()> {
-        self.max_vel.set(Self::JOINT_VEL_BOUND.map(|v| v * speed));
-        self.max_acc.set(Self::JOINT_ACC_BOUND.map(|v| v * speed));
+    fn set_scale(&mut self, scale: f64) -> RobotResult<()> {
+        self.max_vel.set(Self::JOINT_VEL_BOUND.map(|v| v * scale));
+        self.max_acc.set(Self::JOINT_ACC_BOUND.map(|v| v * scale));
         self.max_cartesian_vel
-            .set(Self::CARTESIAN_VEL_BOUND * speed);
+            .set(Self::CARTESIAN_VEL_BOUND * scale);
         self.max_cartesian_acc
-            .set(Self::CARTESIAN_ACC_BOUND * speed);
+            .set(Self::CARTESIAN_ACC_BOUND * scale);
         Ok(())
     }
 
@@ -69,13 +69,13 @@ where
         self.coord.once(coord);
         self
     }
-    fn with_speed(&mut self, speed: f64) -> &mut Self {
-        self.max_vel.once(Self::JOINT_VEL_BOUND.map(|v| v * speed));
-        self.max_acc.once(Self::JOINT_ACC_BOUND.map(|v| v * speed));
+    fn with_scale(&mut self, scale: f64) -> &mut Self {
+        self.max_vel.once(Self::JOINT_VEL_BOUND.map(|v| v * scale));
+        self.max_acc.once(Self::JOINT_ACC_BOUND.map(|v| v * scale));
         self.max_cartesian_vel
-            .once(Self::CARTESIAN_VEL_BOUND * speed);
+            .once(Self::CARTESIAN_VEL_BOUND * scale);
         self.max_cartesian_acc
-            .once(Self::CARTESIAN_ACC_BOUND * speed);
+            .once(Self::CARTESIAN_ACC_BOUND * scale);
         self
     }
     fn with_velocity(&mut self, joint_vel: &[f64; N]) -> &mut Self {
