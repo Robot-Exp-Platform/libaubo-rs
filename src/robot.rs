@@ -112,23 +112,3 @@ where
         self
     }
 }
-
-impl<T: AuboType, const N: usize> ArmParam<N> for AuboRobot<T, N>
-where
-    T: ArmParam<N>,
-{
-    const JOINT_DEFAULT: [f64; N] = T::JOINT_DEFAULT;
-    const JOINT_MIN: [f64; N] = T::JOINT_MIN;
-    const JOINT_MAX: [f64; N] = T::JOINT_MAX;
-    const JOINT_VEL_BOUND: [f64; N] = T::JOINT_VEL_BOUND;
-    const JOINT_ACC_BOUND: [f64; N] = T::JOINT_ACC_BOUND;
-    const JOINT_JERK_BOUND: [f64; N] = T::JOINT_JERK_BOUND;
-    const CARTESIAN_VEL_BOUND: f64 = T::CARTESIAN_VEL_BOUND;
-    const CARTESIAN_ACC_BOUND: f64 = T::CARTESIAN_ACC_BOUND;
-    const CARTESIAN_JERK_BOUND: f64 = T::CARTESIAN_JERK_BOUND;
-    const ROTATION_VEL_BOUND: f64 = T::ROTATION_VEL_BOUND;
-    const ROTATION_ACC_BOUND: f64 = T::ROTATION_ACC_BOUND;
-    const ROTATION_JERK_BOUND: f64 = T::ROTATION_JERK_BOUND;
-    const TORQUE_BOUND: [f64; N] = T::TORQUE_BOUND;
-    const TORQUE_DOT_BOUND: [f64; N] = T::TORQUE_DOT_BOUND;
-}
