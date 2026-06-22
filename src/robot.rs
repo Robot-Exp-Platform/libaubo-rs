@@ -1,7 +1,8 @@
 use std::marker::PhantomData;
 
 use robot_behavior::{
-    Arm, ArmDOF, ArmParam, ArmState, Coord, LoadState, OverrideOnce, RobotResult,
+    Arm, ArmState, Coord, EndPoint, FlangeSpace, JointSpace, Joints, LoadState, MoveTo,
+    OverrideOnce, Pose, Robot, RobotResult,
 };
 
 pub trait AuboType {
@@ -19,13 +20,9 @@ pub struct AuboRobot<T: AuboType, const N: usize> {
     pub(crate) max_rotation_acc: OverrideOnce<f64>,
 }
 
-impl<T: AuboType> ArmDOF for AuboRobot<T, { T::N }> {
-    const N: usize = { T::N };
-}
-
 impl<T: AuboType, const N: usize> AuboRobot<T, N>
 where
-    Self: ArmParam<N>,
+    Self: Joints<N> + EndPoint,
 {
     pub fn new(_ip: &str) -> Self {
         Self {
@@ -39,23 +36,13 @@ where
             max_rotation_acc: OverrideOnce::new(Self::ROTATION_ACC_BOUND),
         }
     }
-}
 
-impl<T: AuboType, const N: usize> Arm<N> for AuboRobot<T, N>
-where
-    AuboRobot<T, N>: ArmParam<N>,
-{
-    fn state(&mut self) -> RobotResult<ArmState<N>> {
-        unimplemented!()
-    }
-    fn set_load(&mut self, _load: LoadState) -> RobotResult<()> {
-        unimplemented!()
-    }
-    fn set_coord(&mut self, coord: Coord) -> RobotResult<()> {
+    pub fn set_coord(&mut self, coord: Coord) -> RobotResult<()> {
         self.coord.set(coord);
         Ok(())
     }
-    fn set_scale(&mut self, scale: f64) -> RobotResult<()> {
+
+    pub fn set_scale(&mut self, scale: f64) -> RobotResult<()> {
         self.max_vel.set(Self::JOINT_VEL_BOUND.map(|v| v * scale));
         self.max_acc.set(Self::JOINT_ACC_BOUND.map(|v| v * scale));
         self.max_cartesian_vel
@@ -65,11 +52,12 @@ where
         Ok(())
     }
 
-    fn with_coord(&mut self, coord: Coord) -> &mut Self {
+    pub fn with_coord(&mut self, coord: Coord) -> &mut Self {
         self.coord.once(coord);
         self
     }
-    fn with_scale(&mut self, scale: f64) -> &mut Self {
+
+    pub fn with_scale(&mut self, scale: f64) -> &mut Self {
         self.max_vel.once(Self::JOINT_VEL_BOUND.map(|v| v * scale));
         self.max_acc.once(Self::JOINT_ACC_BOUND.map(|v| v * scale));
         self.max_cartesian_vel
@@ -78,37 +66,153 @@ where
             .once(Self::CARTESIAN_ACC_BOUND * scale);
         self
     }
-    fn with_velocity(&mut self, joint_vel: &[f64; N]) -> &mut Self {
+
+    pub fn with_velocity(&mut self, joint_vel: &[f64; N]) -> &mut Self {
         self.max_vel.once(*joint_vel);
         self
     }
-    fn with_acceleration(&mut self, joint_acc: &[f64; N]) -> &mut Self {
+
+    pub fn with_acceleration(&mut self, joint_acc: &[f64; N]) -> &mut Self {
         self.max_acc.once(*joint_acc);
         self
     }
-    fn with_jerk(&mut self, _joint_jerk: &[f64; N]) -> &mut Self {
+
+    pub fn with_jerk(&mut self, _joint_jerk: &[f64; N]) -> &mut Self {
         self
     }
-    fn with_cartesian_velocity(&mut self, cartesian_vel: f64) -> &mut Self {
+
+    pub fn with_cartesian_velocity(&mut self, cartesian_vel: f64) -> &mut Self {
         self.max_cartesian_vel.once(cartesian_vel);
         self
     }
-    fn with_cartesian_acceleration(&mut self, cartesian_acc: f64) -> &mut Self {
+
+    pub fn with_cartesian_acceleration(&mut self, cartesian_acc: f64) -> &mut Self {
         self.max_cartesian_acc.once(cartesian_acc);
         self
     }
-    fn with_cartesian_jerk(&mut self, _cartesian_jerk: f64) -> &mut Self {
+
+    pub fn with_cartesian_jerk(&mut self, _cartesian_jerk: f64) -> &mut Self {
         self
     }
-    fn with_rotation_velocity(&mut self, rotation_vel: f64) -> &mut Self {
+
+    pub fn with_rotation_velocity(&mut self, rotation_vel: f64) -> &mut Self {
         self.max_rotation_vel.once(rotation_vel);
         self
     }
-    fn with_rotation_acceleration(&mut self, rotation_acc: f64) -> &mut Self {
+
+    pub fn with_rotation_acceleration(&mut self, rotation_acc: f64) -> &mut Self {
         self.max_rotation_acc.once(rotation_acc);
         self
     }
-    fn with_rotation_jerk(&mut self, _rotation_jerk: f64) -> &mut Self {
+
+    pub fn with_rotation_jerk(&mut self, _rotation_jerk: f64) -> &mut Self {
+        self
+    }
+}
+
+impl<T: AuboType, const N: usize> Robot for AuboRobot<T, N> {
+    type State = ArmState<N>;
+    const CONTROL_PERIOD: f64 = 1e-3;
+
+    fn version() -> String {
+        "AuboRobot".to_string()
+    }
+
+    fn read_state(&mut self) -> RobotResult<Self::State> {
+        Ok(ArmState::default())
+    }
+}
+
+impl<T: AuboType, const N: usize> Joints<N> for AuboRobot<T, N> {
+    const JOINT_MIN: [f64; N] = [-std::f64::consts::TAU; N];
+    const JOINT_MAX: [f64; N] = [std::f64::consts::TAU; N];
+    const JOINT_VEL_BOUND: [f64; N] = [std::f64::consts::PI; N];
+    const JOINT_ACC_BOUND: [f64; N] = [std::f64::consts::TAU; N];
+}
+
+impl<T: AuboType, const N: usize> EndPoint for AuboRobot<T, N> {
+    const CARTESIAN_VEL_BOUND: f64 = 1.0;
+    const CARTESIAN_ACC_BOUND: f64 = 1.0;
+    const ROTATION_VEL_BOUND: f64 = std::f64::consts::PI;
+    const ROTATION_ACC_BOUND: f64 = std::f64::consts::TAU;
+}
+
+impl<T: AuboType, const N: usize> MoveTo<JointSpace<N>> for AuboRobot<T, N> {
+    fn move_to(&mut self, _target: [f64; N]) -> RobotResult<()> {
+        unimplemented!()
+    }
+}
+
+impl<T: AuboType, const N: usize> MoveTo<FlangeSpace> for AuboRobot<T, N> {
+    fn move_to(&mut self, _target: Pose) -> RobotResult<()> {
+        unimplemented!()
+    }
+}
+
+impl<T: AuboType, const N: usize> Arm<N> for AuboRobot<T, N> {
+    fn state(&mut self) -> RobotResult<ArmState<N>> {
+        self.read_state()
+    }
+
+    fn set_load(&mut self, _load: LoadState) -> RobotResult<()> {
+        unimplemented!()
+    }
+
+    fn get_joint(&self) -> [f64; N] {
+        [0.; N]
+    }
+
+    fn get_endpoint(&self) -> Pose {
+        Pose::default()
+    }
+
+    fn with_joint_vel(mut self, vel_bound: [f64; N]) -> Self {
+        self.max_vel.once(vel_bound);
+        self
+    }
+
+    fn with_joint_acc(mut self, acc_bound: [f64; N]) -> Self {
+        self.max_acc.once(acc_bound);
+        self
+    }
+
+    fn with_joint_jerk(self, _jerk_bound: [f64; N]) -> Self {
+        self
+    }
+
+    fn with_torque(self, _torque_bound: [f64; N]) -> Self {
+        self
+    }
+
+    fn with_torque_dot(self, _torque_dot_bound: [f64; N]) -> Self {
+        self
+    }
+
+    fn with_cartesian_vel(mut self, vel_bound: f64) -> Self {
+        self.max_cartesian_vel.once(vel_bound);
+        self
+    }
+
+    fn with_cartesian_acc(mut self, acc_bound: f64) -> Self {
+        self.max_cartesian_acc.once(acc_bound);
+        self
+    }
+
+    fn with_cartesian_jerk(self, _jerk_bound: f64) -> Self {
+        self
+    }
+
+    fn with_rotation_vel(mut self, vel_bound: f64) -> Self {
+        self.max_rotation_vel.once(vel_bound);
+        self
+    }
+
+    fn with_rotation_acc(mut self, acc_bound: f64) -> Self {
+        self.max_rotation_acc.once(acc_bound);
+        self
+    }
+
+    fn with_rotation_jerk(self, _jerk_bound: f64) -> Self {
         self
     }
 }
