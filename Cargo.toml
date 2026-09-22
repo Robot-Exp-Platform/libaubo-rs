@@ -15,7 +15,7 @@ name = "libaubo"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-robot_behavior = "0.6.0"
+robot_behavior = { version = "0.6.0", git = "ssh://git@github.com/Robot-Exp-Platform/robot_behavior.git", rev = "79a3820af143a3ab75dfd3b308469482aac534c0" }
 pyo3 = { version = "0.28.3", optional = true, features = [
     "extension-module",
     "multiple-pymethods",
