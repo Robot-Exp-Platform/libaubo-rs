@@ -1,12 +1,12 @@
 [package]
 name = "libaubo"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 authors = ["Yixing <yanjizhou312@163.com>"]
 readme = "README.md"
 repository = "https://github.com/Robot-Exp-Platform/libaubo-rs"
 license = "Apache-2.0"
-description = "Rust bindings for the Hans robot"
+description = "Rust bindings for the Aubo robot"
 categories = ["science::robotics"]
 keywords = ["aubo", "robot"]
 
@@ -15,7 +15,7 @@ name = "libaubo"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-robot_behavior = "0.6.0"
+robot_behavior = { version = "0.6.0", git = "ssh://git@github.com/Robot-Exp-Platform/robot_behavior.git", rev = "781245ca4d662a693cfb24955328a5a610859591" }
 pyo3 = { version = "0.28.3", optional = true, features = [
     "extension-module",
     "multiple-pymethods",
