@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use robot_behavior::{
+use roplat_behavior::{
     Arm, ArmState, Coord, EndPoint, FlangeSpace, JointSpace, Joints, LoadState, MoveTo,
     OverrideOnce, Pose, Robot, RobotResult,
 };

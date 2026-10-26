@@ -1,12 +1,12 @@
 # libaubo
 
-`libaubo` is the Aubo model and behavior-interface scaffold in the [Robot-Exp driver ecosystem](https://github.com/Robot-Exp-Platform/robot_behavior). The published crate is **`libaubo 0.2.0`**.
+`libaubo` is the Aubo model and behavior-interface scaffold in the [Robot-Exp driver ecosystem](https://github.com/Robot-Exp-Platform/roplat_behavior). The published crate is **`libaubo 0.2.0`**.
 
 **This version does not connect to or control an Aubo robot.** `AuboRobot::new(ip)` ignores its IP argument, `read_state()` returns a default placeholder state, and target motion and load setting are unimplemented. Use it to explore the typed API and current parameters, not as a working hardware backend.
 
 ## Why it exists
 
-The intended separation matches other Robot-Exp drivers: model types identify the robot and joint count, `robot_behavior` traits describe capabilities, and a device backend implements the actual protocol. This crate provides the first part and the shape of the second. Aubo C, E, I, IH, and IS aliases share the generic `AuboRobot<T, N>` implementation.
+The intended separation matches other Robot-Exp drivers: model types identify the robot and joint count, `roplat_behavior` traits describe capabilities, and a device backend implements the actual protocol. This crate provides the first part and the shape of the second. Aubo C, E, I, IH, and IS aliases share the generic `AuboRobot<T, N>` implementation.
 
 The useful workflow today is **select a model type → inspect capability types → configure local parameters → develop or integrate a real backend**. A trait containing placeholders does not establish hardware support. Generic joint/Cartesian bounds in the source are not a calibrated database for every Aubo model.
 
@@ -16,11 +16,13 @@ Create a binary project with `cargo new aubo-types`, then add:
 
 ```toml
 [dependencies]
-libaubo = "0.2.0"
-robot_behavior = "0.6.1"
+libaubo = "0.5.0"
+roplat_behavior = "0.9.0"
 ```
 
-Use Rust nightly because these crates use unstable Rust features. The direct behavior dependency provides the traits below and selects the published 0.6.1 fixes. This offline scaffold needs no parent `drives` checkout or vendor SDK installation.
+> `roplat_behavior` 0.9 (the renamed `robot_behavior`) and this release are not on crates.io yet; until they are, build from the [drives](https://github.com/Robot-Exp-Platform/drives) workspace. See the [migration notes](https://github.com/Robot-Exp-Platform/roplat_behavior/blob/main/MIGRATION.md).
+
+Use Rust nightly because these crates use unstable Rust features. The direct behavior dependency provides the traits below. This offline scaffold needs no parent `drives` checkout or vendor SDK installation.
 
 The default feature set is empty. Although `ffi`, `to_c`, `to_py`, and `to_cxx` appear in the manifest, the current library entry point does not expose a working Aubo language-binding module. Enabling these flags does not add a controller connection. There is no supported robot/firmware/host matrix to infer from this release.
 
@@ -30,7 +32,7 @@ Put this in `src/main.rs`. It creates a local object, sets a local parameter, an
 
 ```rust
 use libaubo::AuboI5;
-use robot_behavior::{Joints, RobotResult};
+use roplat_behavior::{Joints, RobotResult};
 
 fn main() -> RobotResult<()> {
     // The constructor currently ignores this argument; no connection is made.
@@ -63,7 +65,7 @@ The constructor and `set_scale()` only affect the local Rust object. The printed
 
 A real backend needs explicit connection errors, live state conversion, and command-completion semantics, together with units, model-specific parameters, and platform requirements. Those are necessary before this API can support hardware motion.
 
-The repository has no examples directory. Start with [model aliases](src/aubo), [the generic implementation](src/robot.rs), the [published API](https://docs.rs/libaubo/0.2.0/libaubo/), and the [behavior guide](https://github.com/Robot-Exp-Platform/robot_behavior). The complete example above stays within implemented offline behavior.
+The repository has no examples directory. Start with [model aliases](src/aubo), [the generic implementation](src/robot.rs), the [published API](https://docs.rs/libaubo/0.2.0/libaubo/), and the [behavior guide](https://github.com/Robot-Exp-Platform/roplat_behavior). The complete example above stays within implemented offline behavior.
 
 ## Source builds and license
 
