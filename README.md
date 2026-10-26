@@ -67,6 +67,6 @@ The repository has no examples directory. Start with [model aliases](src/aubo), 
 
 ## Source builds and license
 
-Checkout manifests pin development behavior dependencies to a Git revision and require access to that GitHub source. Registry installation uses published dependencies and needs no adjacent workspace.
+Checkout manifests use the same crates.io dependencies as the published crate; neither a source build nor a registry installation needs an adjacent workspace.
 
 The scaffold is maintained by Robot-Exp-Platform under [Apache-2.0](LICENSE). Aubo is the manufacturer's name. This repository does not bundle an Aubo SDK or confer rights to separate vendor firmware and software.
