@@ -1,8 +1,8 @@
 use std::{marker::PhantomData, time::Duration};
 
 use roplat_behavior::{
-    Arm, ArmState, EndPoint, FlangeSpace, JointSpace, Joints, LoadState, MotionLimits, MoveTo,
-    Pose, Robot, RobotResult,
+    Arm, ArmState, EndPoint, EndPointPose, FlangeSpace, JointSpace, Joints, LoadState,
+    MotionLimits, MoveTo, Pose, Robot, RobotResult,
 };
 
 pub trait AuboType {
@@ -51,7 +51,9 @@ impl<T: AuboType, const N: usize> EndPoint for AuboRobot<T, N> {
     const CARTESIAN_ACC_BOUND: f64 = 1.0;
     const ROTATION_VEL_BOUND: f64 = std::f64::consts::PI;
     const ROTATION_ACC_BOUND: f64 = std::f64::consts::TAU;
+}
 
+impl<T: AuboType, const N: usize> EndPointPose for AuboRobot<T, N> {
     fn get_endpoint(&self) -> Pose {
         Pose::default()
     }
