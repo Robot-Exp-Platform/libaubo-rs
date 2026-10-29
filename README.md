@@ -24,7 +24,7 @@ roplat_behavior = "0.9.0"
 
 Use Rust nightly because these crates use unstable Rust features. The direct behavior dependency provides the traits below. This offline scaffold needs no parent `drives` checkout or vendor SDK installation.
 
-The default feature set is empty. Although `ffi`, `to_c`, `to_py`, and `to_cxx` appear in the manifest, the current library entry point does not expose a working Aubo language-binding module. Enabling these flags does not add a controller connection. There is no supported robot/firmware/host matrix to infer from this release.
+The crate has no features and no language bindings. There is no supported robot/firmware/host matrix to infer from this release.
 
 ## Minimal example: inspect a model type offline
 
@@ -32,12 +32,12 @@ Put this in `src/main.rs`. It creates a local object, sets a local parameter, an
 
 ```rust
 use libaubo::AuboI5;
-use roplat_behavior::{Joints, RobotResult};
+use roplat_behavior::{Arm, Joints, RobotResult};
 
 fn main() -> RobotResult<()> {
     // The constructor currently ignores this argument; no connection is made.
     let mut robot = AuboI5::new("unused");
-    robot.set_scale(0.1)?;
+    robot.set_motion_limits(robot.motion_limits().scaled(0.1))?;
     println!("generic lower bounds: {:?}", <AuboI5 as Joints<6>>::JOINT_MIN);
     println!("generic upper bounds: {:?}", <AuboI5 as Joints<6>>::JOINT_MAX);
     Ok(())
@@ -50,7 +50,7 @@ Check without running:
 cargo +nightly check
 ```
 
-The constructor and `set_scale()` only affect the local Rust object. The printed bounds are implementation defaults, not measurements or a promise that they are appropriate limits for a physical Aubo I5.
+The constructor and `set_motion_limits()` only affect the local Rust object. The printed bounds are implementation defaults, not measurements or a promise that they are appropriate limits for a physical Aubo I5.
 
 ## Implemented behavior and next steps
 
