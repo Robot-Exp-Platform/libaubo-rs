@@ -1,8 +1,8 @@
 use std::{marker::PhantomData, time::Duration};
 
 use roplat_behavior::{
-    Arm, ArmState, EndPoint, EndPointPose, FlangeSpace, JointSpace, Joints, LoadState,
-    MotionLimits, MoveTo, Pose, Robot, RobotResult,
+    Arm, ArmState, CartesianLimits, EndPoint, EndPointPose, FlangeSpace, JointLimits, JointSpace,
+    Joints, LoadState, MotionLimits, MoveTo, Pose, Robot, RobotResult,
 };
 
 pub trait AuboType {
@@ -40,17 +40,21 @@ impl<T: AuboType, const N: usize> Robot for AuboRobot<T, N> {
 }
 
 impl<T: AuboType, const N: usize> Joints<N> for AuboRobot<T, N> {
-    const JOINT_MIN: [f64; N] = [-std::f64::consts::TAU; N];
-    const JOINT_MAX: [f64; N] = [std::f64::consts::TAU; N];
-    const JOINT_VEL_BOUND: [f64; N] = [std::f64::consts::PI; N];
-    const JOINT_ACC_BOUND: [f64; N] = [std::f64::consts::TAU; N];
+    const JOINT_LIMITS: JointLimits<N> = JointLimits {
+        dq_max: [std::f64::consts::PI; N],
+        ddq_max: [std::f64::consts::TAU; N],
+        ..JointLimits::positions([-std::f64::consts::TAU; N], [std::f64::consts::TAU; N])
+    };
 }
 
 impl<T: AuboType, const N: usize> EndPoint for AuboRobot<T, N> {
-    const CARTESIAN_VEL_BOUND: f64 = 1.0;
-    const CARTESIAN_ACC_BOUND: f64 = 1.0;
-    const ROTATION_VEL_BOUND: f64 = std::f64::consts::PI;
-    const ROTATION_ACC_BOUND: f64 = std::f64::consts::TAU;
+    const CARTESIAN_LIMITS: CartesianLimits = CartesianLimits {
+        linear_velocity_max: 1.0,
+        linear_acceleration_max: 1.0,
+        angular_velocity_max: std::f64::consts::PI,
+        angular_acceleration_max: std::f64::consts::TAU,
+        ..CartesianLimits::UNBOUNDED
+    };
 }
 
 impl<T: AuboType, const N: usize> EndPointPose for AuboRobot<T, N> {
