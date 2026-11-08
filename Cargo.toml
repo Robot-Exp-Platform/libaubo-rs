@@ -1,24 +1,20 @@
 [package]
 name = "libaubo"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2024"
 authors = ["Yixing <yanjizhou312@163.com>"]
 readme = "README.md"
 repository = "https://github.com/Robot-Exp-Platform/libaubo-rs"
 license = "Apache-2.0"
-description = "Rust bindings for the Aubo robot"
+description = "AUBO i-series arms on the ARCS controller for roplat: JSON-RPC commands and RTDE state over TCP, implementing the roplat_behavior contracts"
 categories = ["science::robotics"]
-keywords = ["aubo", "robot"]
-
-[lib]
-name = "libaubo"
-crate-type = ["cdylib", "rlib"]
+keywords = ["aubo", "robot", "arcs", "json-rpc", "roplat"]
 
 [dependencies]
 roplat_behavior = "0.9.0"
-nalgebra = { version = "0.34", features = ["serde-serialize"] }
-serde = { version = "1.0", features = ["derive"] }
+# JSON parsing of results and RTDE packets; roplat_behavior depends on it
+# already. Requests are written by hand.
 serde_json = "1.0"
 
-[features]
-default = []
+[dev-dependencies]
+roplat_behavior = { version = "0.9.0", features = ["conformance"] }
