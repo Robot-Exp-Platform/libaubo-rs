@@ -38,8 +38,9 @@ fn main() -> RobotResult<()> {
     // The constructor currently ignores this argument; no connection is made.
     let mut robot = AuboI5::new("unused");
     robot.set_motion_limits(robot.motion_limits().scaled(0.1))?;
-    println!("generic lower bounds: {:?}", <AuboI5 as Joints<6>>::JOINT_MIN);
-    println!("generic upper bounds: {:?}", <AuboI5 as Joints<6>>::JOINT_MAX);
+    let limits = <AuboI5 as Joints<6>>::JOINT_LIMITS;
+    println!("generic lower bounds: {:?}", limits.q_min);
+    println!("generic upper bounds: {:?}", limits.q_max);
     Ok(())
 }
 ```
